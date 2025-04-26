@@ -59,3 +59,32 @@ accidents_420 %>%
   geom_point(aes(date, fatalities_count, col = e420, alpha = 0.3)) +
   geom_line(aes(date, fatalities_count, col = e420, alpha = 0.3))
   # geom_hline(aes(yintercept = mean_deaths, lty = e420))
+
+## are accidents more prevalent the day after 4/20? ####
+accidents_420 %>% 
+  mutate(e420 = replace_na(e420, FALSE),
+         e421 = lubridate::month(date)==4 & lubridate::day(date)==21,
+         whichDay = case_when(e420 ~ "420",
+                              e421 ~ "421",
+                              TRUE ~ "Other")) %>% 
+  group_by(date, whichDay) %>% 
+  summarise(fatalities_count = sum(fatalities_count)) %>% 
+  ungroup() %>% 
+  # filter(date >= ymd(format(max(date), "%Y/%m/%d")) - years(3)) %>% 
+  ggplot() +
+  geom_point(aes(date, fatalities_count, col = whichDay, alpha = 0.3)) #+
+# geom_line(aes(date, fatalities_count, col = e420, alpha = 0.3))
+# geom_hline(aes(yintercept = mean_deaths, lty = e420))
+
+accidents_420 %>% 
+  mutate(e420 = replace_na(e420, FALSE),
+         e421 = lubridate::month(date)==4 & lubridate::day(date)==21,
+         whichDay = case_when(e420 ~ "420",
+                              e421 ~ "421",
+                              TRUE ~ "Other")) %>% 
+  filter(whichDay != "Other") %>% 
+  # filter(date >= ymd(format(max(date), "%Y/%m/%d")) - years(3)) %>% 
+  ggplot() +
+  geom_point(aes(date, fatalities_count, col = whichDay)) +
+  geom_line(aes(date, fatalities_count, col = whichDay))
+# geom_hline(aes(yintercept = mean_deaths, lty = e420))
